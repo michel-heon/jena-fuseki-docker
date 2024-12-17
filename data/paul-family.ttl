@@ -1,0 +1,48 @@
+@prefix : <http://example.org/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+# Class definitions
+:Person rdf:type rdfs:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "Represents a person."@en .
+
+# Property definitions
+:name rdf:type rdf:Property ;
+    rdfs:domain :Person ;
+    rdfs:range rdfs:Literal ;
+    rdfs:label "name"@en ;
+    rdfs:comment "The person's name."@en .
+
+:age rdf:type rdf:Property ;
+    rdfs:domain :Person ;
+    rdfs:range rdfs:Literal ;
+    rdfs:label "age"@en ;
+    rdfs:comment "The person's age."@en .
+
+:isParentOf rdf:type rdf:Property ;
+    rdfs:domain :Person ;
+    rdfs:range :Person ;
+    rdfs:label "is parent of"@en ;
+    rdfs:comment "Indicates that the person is a parent of another person."@en .
+
+# Instances of people
+:John rdf:type :Person ;
+    :name "John Smith" ;
+    :age "45" ;
+    foaf:mbox <mailto:john.smith@example.org> .
+
+:Mary rdf:type :Person ;
+    :name "Mary Smith" ;
+    :age "42" ;
+    foaf:mbox <mailto:mary.smith@example.org> .
+
+:Paul rdf:type :Person ;
+    :name "Paul Smith" ;
+    :age "18" ;
+    foaf:mbox <mailto:paul.smith@example.org> .
+
+# Familial relationships
+:John :isParentOf :Paul .
+:Mary :isParentOf :Paul .
