@@ -3,6 +3,9 @@ FROM eclipse-temurin:17-jdk
 # Define versions
 ARG JENA_VERSION=5.2.0
 
+# Define dataset name
+ENV FUSEKI_DATASET=dataset
+
 # Install necessary tools and download Jena and Fuseki
 RUN apt-get update && \
     apt-get install -y wget && \
