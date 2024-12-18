@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cotechnoe-jena-fuseki-deployment
+  labels:
+    app: cotechnoe-jena-fuseki
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cotechnoe-jena-fuseki
+  template:
+    metadata:
+      labels:
+        app: cotechnoe-jena-fuseki
+    spec:
+      containers:
+      - name: cotechnoe-jena-fuseki
+        image: acr-fuseki-dev.azurecr.io/cotechnoe-jena-fuseki:latest
+        ports:
+        - containerPort: 3030
+        env:
+        - name: RESOURCE_GROUP
+          value: rg-fuseki-dev
+        - name: ACR_NAME
+          value: acr-fuseki-dev
+        - name: AKS_CLUSTER
+          value: aks-fuseki-dev
+        - name: IMAGE_NAME
+          value: cotechnoe-jena-fuseki
+        - name: IMAGE_TAG
+          value: latest
+        - name: DEPLOYMENT_FILE
+          value: deployment.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cotechnoe-jena-fuseki-service
+spec:
+  selector:
+    app: cotechnoe-jena-fuseki
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3030
+  type: LoadBalancer

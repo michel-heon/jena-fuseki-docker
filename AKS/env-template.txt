@@ -1,0 +1,34 @@
+# Project Configuration
+# Save that file to .env in the root of the project and adjust the values.
+
+# Azure Resource Group Name
+# Replace 'your_resource_group' with the name of your Azure resource group.
+RESOURCE_GROUP=your_resource_group
+
+# Azure Resource Group Location
+# Replace 'your_resource_group_location' with the location of your Azure resource group.
+RESOURCE_GROUP_LOCATION=your_resource_group_location
+
+# Azure Container Registry Name
+# Replace 'your_registry_name' with the name of your Azure Container Registry.
+# According to Azure's naming conventions for ACR, registry names must adhere to the following rules:
+#   Character Requirements: Registry names can only include alphanumeric characters (a-z, 0-9).
+#   Length Constraints: Names must be between 5 and 50 characters in length.
+ACR_NAME=your_registry_name
+
+# Azure Kubernetes Service Cluster Name
+# Replace 'your_cluster_name' with the name of your Azure Kubernetes Service cluster.
+AKS_CLUSTER=your_cluster_name
+
+# Docker Image Name
+# Default: 'jena-fuseki'
+IMAGE_NAME=jena-fuseki
+
+# Docker Image Tag
+# Default: 'latest'
+IMAGE_TAG=latest
+
+# Kubernetes Deployment File
+# Default: 'deployment.yaml'
+DEPLOYMENT_FILE=deployment.yaml
+
