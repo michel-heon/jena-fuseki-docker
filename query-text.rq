@@ -1,0 +1,7 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX text: <http://jena.apache.org/text#>
+select ?s ?sc ?lit ?o
+where {
+    (?s ?sc ?lit) text:query ( rdfs:label "age" ) .
+    ?s rdfs:label ?o .
+}

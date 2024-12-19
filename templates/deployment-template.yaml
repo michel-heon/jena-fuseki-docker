@@ -17,6 +17,14 @@ spec:
       containers:
       - name: $IMAGE_NAME
         image: $DOCKER_IMAGE
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
         ports:
         - containerPort: 3030
         env:
@@ -33,15 +41,21 @@ spec:
         - name: DEPLOYMENT_FILE
           value: $DEPLOYMENT_FILE
 ---
-apiVersion: v1
-kind: Service
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
 metadata:
-  name: $IMAGE_NAME-service
+  name: $IMAGE_NAME-hpa
 spec:
-  selector:
-    app: $IMAGE_NAME
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3030
-  type: LoadBalancer
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: $IMAGE_NAME-deployment
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80

@@ -1,4 +1,4 @@
-# Project Deployment Guide
+# Apache Jena Fuseki Deployment on Azure Kubernetes Service (AKS)
 
 This guide provides detailed steps to deploy your application on Azure Kubernetes Service (AKS) using the provided `Makefile`, `.env` configuration file, and deployment templates.
 
@@ -37,6 +37,117 @@ Where:
 - `01`: Instance
 
 For more detailed guidelines and specific recommendations, refer to Microsoft's official documentation on naming conventions and resource tagging.  
+
+## Quick start
+To streamline the deployment of your application on Azure Kubernetes Service (AKS), follow these quick start steps:
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/michel-heon/jena-docker.git
+   cd jena-docker/AKS
+   ```
+
+2. **Set Up Environment Variables**:
+
+   - Duplicate the `.env-template` file and rename it to `.env`:
+
+     ```bash
+     cp .env-template .env
+     ```
+
+   - Edit the `.env` file to reflect your specific configuration:
+
+     ```dotenv
+     RESOURCE_GROUP=your_resource_group_name
+     RESOURCE_GROUP_LOCATION=your_resource_group_location
+     ACR_NAME=your_acr_name
+     AKS_CLUSTER=your_aks_cluster_name
+     IMAGE_NAME=your_image_name
+     IMAGE_TAG=your_image_tag
+     DEPLOYMENT_FILE=deployment.yaml
+     ```
+
+3. **Generate the Deployment File**:
+
+   ```bash
+   make generate-deployment
+   ```
+
+4. **Authenticate with Azure**:
+
+   ```bash
+   make azure-login
+   ```
+
+5. **Create Azure Resources**:
+
+   - Create the Resource Group:
+
+     ```bash
+     make create-resource-group
+     ```
+
+   - Create the Azure Container Registry (ACR):
+
+     ```bash
+     make create-acr
+     ```
+
+   - Create the AKS Cluster:
+
+     ```bash
+     make create-aks
+     ```
+
+6. **Build and Deploy the Application**:
+
+   - Log in to ACR:
+
+     ```bash
+     make acr-login
+     ```
+
+   - Build the Docker Image:
+
+     ```bash
+     make docker-build
+     ```
+
+   - Push the Docker Image to ACR:
+
+     ```bash
+     make docker-push
+     ```
+
+   - Integrate AKS with ACR:
+
+     ```bash
+     make aks-acr-integration
+     ```
+
+   - Retrieve AKS Cluster Credentials:
+
+     ```bash
+     make get-credentials
+     ```
+
+   - Deploy the Application to AKS:
+
+     ```bash
+     make deploy
+     ```
+
+7. **Monitor the Deployment**:
+
+   ```bash
+   make watch-service
+   ```
+
+This sequence of commands will set up the necessary Azure resources, build and push your Docker image, and deploy your application to AKS. For detailed explanations and additional options, refer to the sections above.
+
+For more information, consult the [Azure Kubernetes Service Documentation](https://learn.microsoft.com/en-us/azure/aks/). 
+
 
 ## Setup Instructions
 

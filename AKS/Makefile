@@ -1,3 +1,6 @@
+SHELL          := /usr/bin/env bash
+PWD            := $(shell pwd)
+ROOT_DIR       := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 # Check for .env file existence
 ifeq ($(wildcard .env),)
 $(error ".env file not found. Please create a .env file based on .env-template and configure the necessary environment variables.")
@@ -15,7 +18,7 @@ DOCKER_IMAGE := $(ACR_LOGIN_SERVER)/$(IMAGE_NAME):$(IMAGE_TAG)
 .PHONY: generate-deployment
 generate-deployment: ## Generate deployment.yaml from deployment-template.yaml
 	@echo "Generating deployment.yaml from deployment-template.yaml..."
-	@bash -c 'source .env && envsubst < deployment-template.yaml > deployment.yaml'
+	@bash -c 'source .env && envsubst -v < deployment-template.yaml > deployment.yaml'
 	@echo "deployment.yaml has been generated successfully."
 
 # Login to Azure
@@ -55,9 +58,13 @@ docker-push: acr-login ## Push the Docker image to Azure Container Registry
 	cd ../ && \
 	docker push $(DOCKER_IMAGE)
 
+.PHONY: register-containerservice
+register-containerservice: ## Register the Microsoft.ContainerService resource provider
+	az provider register --namespace Microsoft.ContainerService --wait
+
 # Create AKS Cluster
 .PHONY: create-aks
-create-aks: ## Create Azure Kubernetes Service (AKS) cluster
+create-aks: register-containerservice ## Create Azure Kubernetes Service (AKS) cluster
 	az aks create --resource-group $(RESOURCE_GROUP) --name $(AKS_CLUSTER) --node-count 1 --enable-addons monitoring --generate-ssh-keys
 
 # Integrate AKS with ACR
@@ -68,7 +75,7 @@ aks-acr-integration: ## Grant AKS access to pull images from ACR
 # Install kubectl
 .PHONY: install-kubectl
 install-kubectl: ## Install kubectl command-line tool
-	az aks install-cli
+	sudo az aks install-cli
 
 # Get AKS Credentials
 .PHONY: get-credentials
@@ -83,7 +90,17 @@ deploy: get-credentials ## Deploy the application to AKS
 # Watch Service for External IP
 .PHONY: watch-service
 watch-service: ## Monitor the service to obtain the external IP address
-	kubectl get service jena-fuseki-service --watch
+	kubectl get service $(IMAGE_NAME)-service --watch
+
+# Get Pod Status
+.PHONY: pod-status
+pod-status: ## Get the status of the pods
+	kubectl get pods -n default -l app=$(IMAGE_NAME)
+	
+# Get pod logs
+.PHONY: pod-logs
+pod-logs: ## Get the logs of the pods
+	kubectl logs -n default -l app=$(IMAGE_NAME)
 
 # Display help message
 .PHONY: help

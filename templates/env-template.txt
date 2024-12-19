@@ -3,32 +3,45 @@
 
 # Azure Resource Group Name
 # Replace 'your_resource_group' with the name of your Azure resource group.
-RESOURCE_GROUP=your_resource_group
+export RESOURCE_GROUP=your_resource_group
 
 # Azure Resource Group Location
 # Replace 'your_resource_group_location' with the location of your Azure resource group.
-RESOURCE_GROUP_LOCATION=your_resource_group_location
+# example: eastus, westus, northeurope, canadaeast,etc.
+export RESOURCE_GROUP_LOCATION=your_resource_group_location
 
 # Azure Container Registry Name
 # Replace 'your_registry_name' with the name of your Azure Container Registry.
 # According to Azure's naming conventions for ACR, registry names must adhere to the following rules:
 #   Character Requirements: Registry names can only include alphanumeric characters (a-z, 0-9).
 #   Length Constraints: Names must be between 5 and 50 characters in length.
-ACR_NAME=your_registry_name
+export ACR_NAME=your_registry_name
 
 # Azure Kubernetes Service Cluster Name
 # Replace 'your_cluster_name' with the name of your Azure Kubernetes Service cluster.
-AKS_CLUSTER=your_cluster_name
+export AKS_CLUSTER=your_cluster_name
 
 # Docker Image Name
 # Default: 'jena-fuseki'
-IMAGE_NAME=jena-fuseki
+export IMAGE_NAME=jena-fuseki
 
 # Docker Image Tag
 # Default: 'latest'
-IMAGE_TAG=latest
+export IMAGE_TAG=latest
 
 # Kubernetes Deployment File
 # Default: 'deployment.yaml'
-DEPLOYMENT_FILE=deployment.yaml
+export DEPLOYMENT_FILE=deployment.yaml
+
+# shiro configuration file
+# Default: 'shiro.ini'
+export SHIRO_FILE=shiro.ini
+
+# Fuseki Configuration File
+# Default: 'config.ttl'
+export FUSEKI_CONFIG_FILE=config.ttl
+
+# fuseki username and password
+export FUSEKI_USERNAME=your_fuseki_username
+export FUSEKI_PASSWORD=your_fuseki_password
 

@@ -16,14 +16,22 @@ spec:
     spec:
       containers:
       - name: cotechnoe-jena-fuseki
-        image: acr-fuseki-dev.azurecr.io/cotechnoe-jena-fuseki:latest
+        image: acrfusekidev.azurecr.io/cotechnoe-jena-fuseki:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
         ports:
         - containerPort: 3030
         env:
         - name: RESOURCE_GROUP
           value: rg-fuseki-dev
         - name: ACR_NAME
-          value: acr-fuseki-dev
+          value: acrfusekidev
         - name: AKS_CLUSTER
           value: aks-fuseki-dev
         - name: IMAGE_NAME
@@ -33,15 +41,21 @@ spec:
         - name: DEPLOYMENT_FILE
           value: deployment.yaml
 ---
-apiVersion: v1
-kind: Service
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
 metadata:
-  name: cotechnoe-jena-fuseki-service
+  name: cotechnoe-jena-fuseki-hpa
 spec:
-  selector:
-    app: cotechnoe-jena-fuseki
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3030
-  type: LoadBalancer
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cotechnoe-jena-fuseki-deployment
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80

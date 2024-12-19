@@ -29,20 +29,26 @@
 
 # Instances of people
 :John rdf:type :Person ;
+    rdfs:label "John Smith"@en ;
     :name "John Smith" ;
     :age "45" ;
     foaf:mbox <mailto:john.smith@example.org> .
 
 :Mary rdf:type :Person ;
+    rdfs:label "Mary Smith"@en ;
     :name "Mary Smith" ;
     :age "42" ;
     foaf:mbox <mailto:mary.smith@example.org> .
 
 :Paul rdf:type :Person ;
+    rdfs:label "Paul Smith"@en ;
     :name "Paul Smith" ;
     :age "18" ;
     foaf:mbox <mailto:paul.smith@example.org> .
 
 # Familial relationships
-:John :isParentOf :Paul .
-:Mary :isParentOf :Paul .
+:John :isParentOf :Paul ;
+    rdfs:label "John is parent of Paul"@en .
+
+:Mary :isParentOf :Paul ;
+    rdfs:label "Mary is parent of Paul"@en .
