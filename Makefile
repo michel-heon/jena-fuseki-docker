@@ -49,8 +49,11 @@ FUSEKI_QUERY_URL = http://localhost:3030/$(FUSEKI_DATASET)/sparql
 
 .PHONY: image-build container-start container-start-tdb2 data-load data-query fuseki-wait container-stop docker-clean logs-show help shiro-generate config-generate
 
-image-build: shiro-generate config-generate ## Build the Docker image
+image-build: shiro-generate config-generate log42j.properties ## Build the Docker image
 	docker build -t $(IMAGE_NAME) .
+
+log42j.properties: $(TEMPLATE_DIR)/log42j.properties
+	cp $(TEMPLATE_DIR)/log42j.properties log42j.properties
 
 shiro-generate: ## Generate a Shiro.ini configuration file
 	@echo "Generating shiro.ini from shiro-template.ini..."
