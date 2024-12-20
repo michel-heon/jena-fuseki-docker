@@ -21,9 +21,17 @@ export ACR_NAME=your_registry_name
 # Replace 'your_cluster_name' with the name of your Azure Kubernetes Service cluster.
 export AKS_CLUSTER=your_cluster_name
 
-# Docker Image Name
+# Fuseki version
+# Default: '5.2.0'
+export FUSEKI_VERSION=5.2.0
+
+# Docker Container Name
 # Default: 'jena-fuseki'
-export IMAGE_NAME=jena-fuseki
+export CONTAINER_NAME=jena-fuseki
+
+# Docker Image Name
+# Default: 'jena-fuseki:5.2.0'
+export IMAGE_NAME=jena-fuseki:5.2.0
 
 # Docker Image Tag
 # Default: 'latest'
@@ -32,6 +40,10 @@ export IMAGE_TAG=latest
 # Kubernetes Deployment File
 # Default: 'deployment.yaml'
 export DEPLOYMENT_FILE=deployment.yaml
+
+# kubernetes container image name
+# Default: 'cotechnoe-jena-fuseki'
+export K8S_IMAGE_NAME=cotechnoe-jena-fuseki
 
 # shiro configuration file
 # Default: 'shiro.ini'

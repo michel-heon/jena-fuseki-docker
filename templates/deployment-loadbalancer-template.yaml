@@ -20,11 +20,11 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            memory: "128Mi" # Reduced request size for basic usage
-            cpu: "250m"     # Reduced CPU request for basic usage
+            memory: "512Mi"
+            cpu: "500m"
           limits:
-            memory: "256Mi" # Reduced memory limit for basic usage
-            cpu: "500m"     # Reduced CPU limit for basic usage
+            memory: "1Gi"
+            cpu: "1"
         ports:
         - containerPort: 3030
         env:

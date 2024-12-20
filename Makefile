@@ -31,10 +31,14 @@ SHELL          := /usr/bin/env bash
 PWD            := $(shell pwd)
 ROOT_DIR       := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 TEMPLATE_DIR   := $(ROOT_DIR)/templates
+# Check for .env file existence
+ifeq ($(wildcard .env),)
+$(error ".env file not found. Please create a .env file based on .env-template and configure the necessary environment variables.")
+endif
 
-# Image and container names
-IMAGE_NAME     := jena-fuseki:5.2.0
-CONTAINER_NAME := jena-fuseki
+# Include environment variables from .env
+include .env
+export
 
 # Data file path
 DATA_FILE = ./data/paul-family.ttl
@@ -48,6 +52,10 @@ FUSEKI_UPDATE_URL = http://localhost:3030/$(FUSEKI_DATASET)/data?default
 FUSEKI_QUERY_URL = http://localhost:3030/$(FUSEKI_DATASET)/sparql
 
 .PHONY: image-build container-start container-start-tdb2 data-load data-query fuseki-wait container-stop docker-clean logs-show help shiro-generate config-generate
+
+dump-variables: ## Dump all Makefile variables
+	@$(foreach V,$(sort $(.VARIABLES)),\
+		$(if $(filter-out environment% default automatic, $(origin $V)),$(info $V=$($V))))
 
 image-build: shiro-generate config-generate log42j.properties ## Build the Docker image
 	docker build -t $(IMAGE_NAME) .
