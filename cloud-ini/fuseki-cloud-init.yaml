@@ -1,0 +1,132 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - openjdk-17-jre-headless
+  - unzip
+  - wget
+
+runcmd:
+  - cd /opt
+  - wget -q https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-5.3.0.zip
+  - unzip apache-jena-fuseki-5.3.0.zip
+  - mv apache-jena-fuseki-5.3.0 fuseki
+  - useradd -r -s /bin/false fuseki
+  - mkdir -p /data/fuseki/databases/dataset
+  - chown -R fuseki:fuseki /opt/fuseki /data/fuseki
+  - mkdir -p /opt/fuseki/configuration
+  - |
+      echo '# Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+      [main]
+      # Development
+      ssl.enabled = false 
+    
+      plainMatcher=org.apache.shiro.authc.credential.SimpleCredentialsMatcher
+      iniRealm.credentialsMatcher = $plainMatcher
+      # localhostFilter=org.apache.jena.fuseki.authz.LocalhostFilter
+    
+      [users]
+      # Implicitly adds "iniRealm =  org.apache.shiro.realm.text.IniRealm"
+      admin=admin
+    
+      [roles]
+    
+      [urls]
+      ## Control functions open to anyone
+      /$/status  = authcBasic,user[admin]
+      /$/server  = authcBasic,user[admin]
+      /$/ping    = anon
+      /$/metrics = authcBasic,user[admin]
+    
+      ## and the rest are restricted to localhost.
+      /$/** = authcBasic,user[admin]
+    
+    
+      ## If you want simple, basic authentication user/password
+      ## on the operations, 
+      ##    1 - set a better password in [users] above.
+      ##    2 - comment out the "/$/** = localhost" line and use:
+      ##/$/** = authcBasic,user[admin]
+    
+      ## or to allow any access.
+      ##/$/** = anon
+    
+      # Everything else
+      /**=anon' > /data/fuseki/databases/shiro.ini
+  - |
+      echo '<?xml version="1.0"?>
+      <rdf:RDF xmlns="http://www.w3.org/ns/auth/acl#"
+               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <User>
+          <user:username xmlns:user="http://jena.apache.org/fuseki#">admin</user:username>
+          <user:password xmlns:user="http://jena.apache.org/fuseki#">admin</user:password>
+        </User>
+      </rdf:RDF>' > /opt/fuseki/configuration/fuseki-users.rdf
+  - |
+      echo '
+      PREFIX :        <#>
+      PREFIX fuseki:  <http://jena.apache.org/fuseki#>
+      PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+      PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX ja:      <http://jena.hpl.hp.com/2005/11/Assembler#>
+      PREFIX tdb2:    <http://jena.apache.org/2016/tdb#>
+
+      [] rdf:type fuseki:Server ;
+         fuseki:services (
+           :service
+         ) .
+
+      ## Service description for "/dataset"
+      ## with a TDB2 dataset
+
+      :service rdf:type fuseki:Service ;
+          fuseki:name "dataset" ;
+          fuseki:endpoint [ 
+              fuseki:operation fuseki:query ;
+              fuseki:name "sparql" ;
+              ## Set default-union-graph for this endpoint.
+              ja:context [ ja:cxtName "tdb:unionDefaultGraph" ; ja:cxtValue true ] ;
+          ] ;
+          fuseki:endpoint [
+              fuseki:operation fuseki:query ;
+              fuseki:name "query" 
+          ] ;
+          fuseki:endpoint [
+              fuseki:operation fuseki:update ;
+              fuseki:name "update"
+          ] ;
+          fuseki:endpoint [
+              fuseki:operation fuseki:gsp-r ;
+              fuseki:name "get"
+          ] ;
+          fuseki:endpoint [ 
+              fuseki:operation fuseki:gsp-rw ; 
+              fuseki:name "data"
+          ] ; 
+          fuseki:endpoint [ 
+              fuseki:operation fuseki:patch ;
+              fuseki:name "patch"
+          ] ; 
+          fuseki:dataset :dataset_tdb2 ;
+          .
+
+      :dataset_tdb2 rdf:type  tdb2:DatasetTDB2 ;
+          tdb2:location "/data/fuseki/databases/dataset" ;
+          tdb2:unionDefaultGraph true ;      ' > /opt/fuseki/configuration/config.ttl
+  - |
+      echo '[Unit]
+      Description=Apache Fuseki Server
+      After=network.target
+      [Service]
+      Type=simple
+      User=fuseki
+      Environment=FUSEKI_BASE=/data/fuseki/databases
+      Environment=FUSEKI_HOME=/opt/fuseki
+      ExecStart=/opt/fuseki/fuseki-server --config=/opt/fuseki/configuration/config.ttl --port=3030
+      Restart=on-failure
+      [Install]
+      WantedBy=multi-user.target' > /etc/systemd/system/fuseki.service
+  - systemctl daemon-reexec
+  - systemctl daemon-reload
+  - systemctl enable fuseki
+  - systemctl start fuseki

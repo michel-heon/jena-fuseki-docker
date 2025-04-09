@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.w3.org/ns/auth/acl#"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <User>
+    <user:username xmlns:user="http://jena.apache.org/fuseki#">admin</user:username>
+    <user:password xmlns:user="http://jena.apache.org/fuseki#">admin</user:password>
+  </User>
+</rdf:RDF>

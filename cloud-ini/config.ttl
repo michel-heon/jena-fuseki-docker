@@ -1,0 +1,21 @@
+@prefix : <#> .
+@prefix fuseki: <http://jena.apache.org/fuseki#> .
+@prefix tdb2:   <http://jena.apache.org/tdb#> .
+@prefix ja:     <http://jena.hpl.hp.com/2005/11/Assembler#> .
+
+[] rdf:type fuseki:Server ;
+   fuseki:services (
+     <#service1>
+   ) .
+
+<#service1> rdf:type fuseki:Service ;
+    fuseki:name "myds" ;
+    fuseki:serviceQuery "sparql" ;
+    fuseki:serviceUpdate "update" ;
+    fuseki:serviceUpload "upload" ;
+    fuseki:serviceReadWriteGraphStore "data" ;
+    fuseki:dataset <#tdbDataset> ;
+    fuseki:authorization "logged-in" .
+
+<#tdbDataset> rdf:type tdb2:DatasetTDB2 ;
+    tdb2:location "/data/fuseki/databases/myds" .

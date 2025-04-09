@@ -1,0 +1,11 @@
+#!/bin/bash
+export CONSTANT_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+export RESOURCE_GROUP="rg-fuseki-01"
+export LOCATION="canadacentral"
+export VM_NAME="fuseki-vm"
+export IMAGE_NAME="fuseki-image"
+export ADMIN_USER="azureuser"
+export ADMIN_PASSWORD="Cmln12344321."
+export CLOUD_INIT_FILE="$CONSTANT_BASE_DIR/fuseki-cloud-init.yaml"
+export VM_SIZE="Standard_B1s"
+export OS_IMAGE="Ubuntu2404"

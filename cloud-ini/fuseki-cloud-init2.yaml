@@ -1,0 +1,68 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - openjdk-17-jre-headless
+  - unzip
+  - wget
+
+runcmd:
+  - cd /opt
+  - wget https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-5.3.0.zip
+  - unzip apache-jena-fuseki-5.3.0.zip
+  - mv apache-jena-fuseki-5.3.0 fuseki
+  - useradd -r -s /bin/false fuseki
+  - mkdir -p /data/fuseki/databases/myds
+  - chown -R fuseki:fuseki /opt/fuseki /data/fuseki
+  - mkdir -p /opt/fuseki/configuration
+  - |
+      echo '<?xml version="1.0"?>
+      <rdf:RDF xmlns="http://www.w3.org/ns/auth/acl#"
+               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <User>
+          <user:username xmlns:user="http://jena.apache.org/fuseki#">admin</user:username>
+          <user:password xmlns:user="http://jena.apache.org/fuseki#">admin</user:password>
+        </User>
+      </rdf:RDF>' > /opt/fuseki/configuration/fuseki-users.rdf
+  - |
+      echo '@prefix : <#> .
+      @prefix fuseki: <http://jena.apache.org/fuseki#> .
+      @prefix tdb2:   <http://jena.apache.org/tdb#> .
+      @prefix ja:     <http://jena.hpl.hp.com/2005/11/Assembler#> .
+
+      [] rdf:type fuseki:Server ;
+         fuseki:services (
+           <#service1>
+         ) .
+
+      <#service1> rdf:type fuseki:Service ;
+          fuseki:name "myds" ;
+          fuseki:serviceQuery "sparql" ;
+          fuseki:serviceUpdate "update" ;
+          fuseki:serviceUpload "upload" ;
+          fuseki:serviceReadWriteGraphStore "data" ;
+          fuseki:dataset <#tdbDataset> ;
+          fuseki:authorization "logged-in" .
+
+      <#tdbDataset> rdf:type tdb2:DatasetTDB2 ;
+          tdb2:location "/data/fuseki/databases/myds" .
+      ' > /opt/fuseki/configuration/config.ttl
+  - |
+      echo '[Unit]
+      Description=Apache Fuseki Server
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=fuseki
+      ExecStart=/opt/fuseki/fuseki-server --config=/opt/fuseki/configuration/config.ttl --port=3030
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target' > /etc/systemd/system/fuseki.service
+  - systemctl daemon-reexec
+  - systemctl daemon-reload
+  - systemctl enable fuseki
+  - systemctl start fuseki
+
+final_message: "Fuseki sécurisé avec authentification et dataset persistant prêt sur port 3030"
